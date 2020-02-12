@@ -118,7 +118,7 @@
         </el-dialog>
         <!--表格渲染-->
         <el-table ref="table"  :data="data" style="width: 100%;">
-          <el-table-column :selectable="checkboxT" type="selection" width="55" />
+          <el-table-column   type="selection" width="55" />
           <el-table-column  :show-overflow-tooltip="true" prop="username" label="用户名" />
           <el-table-column  :show-overflow-tooltip="true" prop="nickName" label="昵称" />
           <el-table-column  prop="sex" label="性别" />
