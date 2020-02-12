@@ -10,7 +10,7 @@
       <template v-for="(item,index) in navList" v-if="!item.hidden">
         <el-submenu :index="index+''" v-if="!item.leaf" :key="index">
           <template slot="title">
-            <i :class="item.icon"></i>
+            <i class="fa" :class="item.icon"></i>
             <span>
               {{item.name}}
             </span>
@@ -20,7 +20,7 @@
           </el-menu-item>
         </el-submenu>
         <el-menu-item v-else :index="item.path" :key="index">
-          <i :class="item.icon"></i>
+          <i class="fa" :class="item.icon"></i>
           <span slot="title">
             {{item.name}}
           </span>

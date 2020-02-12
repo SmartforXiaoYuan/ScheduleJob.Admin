@@ -106,6 +106,9 @@
             <el-input v-model="editForm.RoutePath" auto-complete="off"></el-input>
           </el-tooltip>
         </el-form-item>
+        <el-form-item label="Icon" prop="Icon">
+          <el-input v-model="editForm.Icon" auto-complete="off"></el-input>
+        </el-form-item>
         <el-form-item label="描述" prop="Description">
           <el-input v-model="editForm.Description" auto-complete="off"></el-input>
         </el-form-item>
