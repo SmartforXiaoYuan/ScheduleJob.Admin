@@ -36,8 +36,8 @@ export default {
   data() {
     return {
       isCollapse: false,
-      sysName: 'PDJobAdmin',
-      sysNameShort: 'Pro',
+      sysName: 'ScJobAdmin',
+      sysNameShort: 'SJob',
       navList: [],
       buttonWidth: {
         width: '180px'
