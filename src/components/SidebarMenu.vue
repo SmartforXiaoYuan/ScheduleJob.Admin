@@ -44,6 +44,7 @@ export default {
       }
     }
   },
+
   methods: {
     getNavList() {
       // console.log(this.$router.options.routes)

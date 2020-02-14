@@ -196,9 +196,10 @@ export default {
 
       getNavigationBar(loginParams).then(data => {
         _this.logining = false
+        console.log(data)
         if (data.Code != 200) {
           _this.$message({
-            message: data.message,
+            message: data.Msg,
             type: 'error'
           })
         } else {
@@ -215,10 +216,11 @@ export default {
             duration: 6000
           })
           window.localStorage.router = JSON.stringify(data.Data.children)
-          console.info(window.localStorage.router)
+
           // window.localStorage.router = this.rrr
           let getRouter = data.Data.children //后台拿到路由
           getRouter = filterAsyncRouter(getRouter) //过滤路由
+          console.info(getRouter)
           router.$addRoutes(getRouter) //动态添加路由
           _this.$router.replace(_this.$route.query.redirect ? _this.$route.query.redirect : '/')
         }

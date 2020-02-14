@@ -1,7 +1,7 @@
 import axios from 'axios';
 import router from '../router/index'
 import Vue from 'vue';
-
+import store from "../store";
 // 请求延时
 axios.defaults.timeout = 20000
 let base = '';
@@ -71,7 +71,12 @@ export const addMenuInfo = params => {
 export const removeMenuInfo = params => {
   return axios.delete(`${base}/api/Menu/delete`, { params: params });
 };
-
+export const getPermissionIds = params => {
+  return axios.get(`${base}/api/MenuTree/GetPermissionIdByRoleId`, { params: params });
+};
+export const addRoleModule = params => {
+  return axios.post(`${base}/api/MenuTree/Assign`, params);
+};
 
 export const saveRefreshtime = params => {
 
@@ -88,3 +93,86 @@ export const saveRefreshtime = params => {
     window.localStorage.refreshtime = new Date(-1);
   }
 };
+
+
+const ToLogin = params => {
+  store.commit("saveToken", "");
+  store.commit("saveTokenExpire", "");
+  store.commit("saveTagsData", "");
+  window.localStorage.removeItem('user');
+  window.localStorage.removeItem('NavigationBar');
+
+  router.replace({
+    path: "/login",
+    query: { redirect: router.currentRoute.fullPath }
+  });
+
+  window.location.reload()
+
+};
+
+// 请求延时
+axios.defaults.timeout = 20000
+
+var storeTemp = store;
+axios.interceptors.request.use(
+  config => {
+    var curTime = new Date()
+    var expiretime = new Date(Date.parse(storeTemp.state.tokenExpire))
+
+    if (storeTemp.state.token && (curTime < expiretime && storeTemp.state.tokenExpire)) {
+      // 判断是否存在token，如果存在的话，则每个http header都加上token
+      config.headers.Authorization = "Bearer " + storeTemp.state.token;
+    }
+
+    saveRefreshtime();
+
+    return config;
+  },
+  err => {
+    return Promise.reject(err);
+  }
+);
+// http response 拦截器
+axios.interceptors.response.use(
+  response => {
+    return response;
+  },
+  error => {
+    // 超时请求处理
+    console.log(error.config)
+    var originalRequest = error.config;
+    if (error.code == 'ECONNABORTED' && error.message.indexOf('timeout') != -1 && !originalRequest._retry) {
+
+      Vue.prototype.$message({
+        message: '请求超时！',
+        type: 'error'
+      });
+
+      originalRequest._retry = true
+      return null;
+    }
+
+    if (error.response) {
+      if (error.response.status == 401) {
+        var curTime = new Date()
+        var refreshtime = new Date(Date.parse(window.localStorage.refreshtime))
+        // 在用户操作的活跃期内
+        if (window.localStorage.refreshtime && (curTime <= refreshtime)) {
+
+        }
+        ToLogin()
+      }
+      // 403 无权限
+      if (error.response.status == 403) {
+        Vue.prototype.$message({
+          message: '失败！该操作无权限',
+          type: 'error'
+        });
+        return null;
+      }
+    }
+    return ""; // 返回接口返回的错误信息
+  }
+);
+
