@@ -59,7 +59,7 @@
           </div>
         </div>
         <!--表格渲染-->
-        <el-table :data="tableData" highlight-current-row v-loading="listLoading" row-key="Id" border lazy :load="load" :tree-props="{children: 'children', hasChildren: 'hasChildren'}" style="width: 100%;">
+        <el-table ref="tableDom" :data="tableData" highlight-current-row v-loading="listLoading" row-key="Id" border lazy :load="load" :tree-props="{children: 'children', hasChildren: 'hasChildren'}" style="width: 100%;">
           <el-table-column type="selection" width="50">
           </el-table-column>
           <el-table-column type="index" width="80">
@@ -116,7 +116,7 @@
           <el-input v-model="editForm.OrderSort" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item prop="PidArr" label="父级菜单" width="" sortable>
-          <el-cascader style="width: 400px" v-model="editForm.PidArr" :options="options" filterable change-on-select></el-cascader>
+          <el-cascader style="width: 400px" :key="isResouceShowedit" v-model="editForm.PidArr" :options="options" filterable change-on-select></el-cascader>
         </el-form-item>
         <el-form-item prop="ApiUrl" label="API地址" width="" sortable>
           <el-input v-model="editForm.ApiUrl" auto-complete="off"></el-input>
@@ -191,7 +191,7 @@ export default {
         Name: ''
       },
       tableData: [],
-      TreeArr: [],
+
       options: [],
       addFormVisible: false,
       editFormVisible: false,
@@ -223,6 +223,7 @@ export default {
         IsMenu: '' //是否是右侧菜单
       },
       isResouceShow: 0,
+      isResouceShowedit: 0,
       editFormRules: {
         Name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
         Code: [{ required: true, message: '请输入路由地址', trigger: 'blur' }]
@@ -276,7 +277,9 @@ export default {
         ],
         phone: [{ required: true, trigger: 'blur' }]
       },
-      data: []
+      data: [],
+      loadNodeMap: new Map(),
+      selectCurrRow: null
     }
   },
   computed: {},
@@ -297,9 +300,11 @@ export default {
 
       this.editFormVisible = true
       this.editForm = {}
-
+      ++this.isResouceShowedit
       this.options = []
       let para = { pid: row.Id }
+      /***点击编辑是row复制***/
+      this.selectCurrRow = row
       GetMenusTreeList(para).then(res => {
         this.options.push(res.data.Data)
         that.editForm = Object.assign({}, row)
@@ -344,6 +349,14 @@ export default {
                 this.$refs['editForm'].resetFields()
                 this.editFormVisible = false
                 this.getMenuTreeTable()
+                const { id } = this.selectCurrRow
+                if (this.loadNodeMap.has(id)) {
+                  const { tree, treeNode, resolve } = this.loadNodeMap.get(id)
+                  this.$set(this.$refs.tableDom.store.states.lazyTreeNodeMap, id, [])
+                  this.load(tree, treeNode, resolve)
+                } else {
+                  this.selectCurrRow.hasChildren = true
+                }
               } else {
                 this.$message({
                   message: res.data.Msg,
@@ -383,6 +396,10 @@ export default {
               })
             }
             this.getMenuTreeTable()
+            const { pid } = row
+            const { tree, treeNode, resolve } = this.maps.get(pid)
+            this.$set(this.$refs.table.store.states.lazyTreeNodeMap, pid, [])
+            this.load(tree, treeNode, resolve)
           })
         })
         .catch(() => {})
@@ -457,6 +474,7 @@ export default {
                 })
                 this.$refs['addForm'].resetFields()
                 this.addFormVisible = false
+
                 this.getMenuTreeTable()
               } else {
                 this.$message({
@@ -482,6 +500,7 @@ export default {
       })
     },
     load(tree, treeNode, resolve) {
+      this.loadNodeMap.set(tree.id, { tree, treeNode, resolve })
       let para = {
         page: this.page,
         f: tree.Id

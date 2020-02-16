@@ -19,8 +19,8 @@
       <div style="margin-bottom: 20px;" class="count-test">
         <el-radio-group @change="loginAccount" v-model="account3">
           <el-radio-button label="测试账号1"></el-radio-button>
-          <el-radio-button label="测试账号2"></el-radio-button>
-          <el-radio-button label="超级管理员"></el-radio-button>
+          <!-- <el-radio-button label="测试账号2"></el-radio-button>
+          <el-radio-button label="超级管理员"></el-radio-button> -->
         </el-radio-group>
       </div>
       <el-form-item style="width:100%;">
@@ -31,8 +31,8 @@
       </el-form-item>
       <el-form-item style="width:100%;">
 
-        <el-button :loading="loginingMock" style="width:100%;" @click.native.prevent="handleSubmitMock">Mock登录
-        </el-button>
+        <!-- <el-button :loading="loginingMock" style="width:100%;" @click.native.prevent="handleSubmitMock">Mock登录
+        </el-button> -->
       </el-form-item>
     </el-form>
 
@@ -217,7 +217,6 @@ export default {
           })
           window.localStorage.router = JSON.stringify(data.Data.children)
 
-          // window.localStorage.router = this.rrr
           let getRouter = data.Data.children //后台拿到路由
           getRouter = filterAsyncRouter(getRouter) //过滤路由
           console.info(getRouter)

@@ -17,12 +17,22 @@ export const getUserByToken = params => {
   return axios.get(`${base}/api/user/getInfoByToken`, { params: params }).then(res => res.data);
 };
 
-
-
-
 export const getNavigationBar = params => {
   return axios.get(`${base}/api/MenuTree/GetNavigationBar`, { params: params }).then(res => res.data);
 };
+
+//任务管理
+
+export const getScheduleJob = params => {
+  return axios.get(`${base}/api/Schedule/GetAllJob`, { params: params }).then(res => res.data);
+};
+export const addScheduleJob = params => {
+  return axios.post(`${base}/api/Schedule/AddSchedule`, params).then(res => res.data);
+};
+export const startScheduleJob = params => {
+  return axios.get(`${base}/api/Schedule/StartJob`, { params: params }).then(res => res.data);
+};
+
 
 // 用户管理
 export const getUserListPage = params => {
